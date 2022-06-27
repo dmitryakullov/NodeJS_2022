@@ -2,9 +2,8 @@ const passport = require('passport');
 const localStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
-const { UsersDb } = require('../db');
+const { signupHandler, loginHandler } = require('../utils/databaseUtils');
 
-console.log({ UsersDb: UsersDb });
 passport.use(
   'signup',
   new localStrategy(
@@ -12,15 +11,7 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-    (email, password, done) => {
-      UsersDb.insert({ email, password }, (err, newUser) => {
-        if (err || !newUser) {
-          return done(err);
-        }
-
-        return done(null, newUser);
-      });
-    },
+    signupHandler,
   ),
 );
 
@@ -31,15 +22,7 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-    (email, password, done) => {
-      UsersDb.findOne({ email, password }, (err, user) => {
-        if (err || !user) {
-          return done(null, false, { message: 'Wrong Email or Password' });
-        }
-
-        return done(null, user, { message: 'Logged in Successfully' });
-      });
-    },
+    loginHandler,
   ),
 );
 
