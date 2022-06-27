@@ -1,36 +1,36 @@
 const express = require('express');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const { JWT_SALT } = require('../constants/salt');
+
 const router = express.Router();
 
-router.post('/signup', passport.authenticate('signup', { session: false }), async (req, res) => {
-  console.log('call q43');
+router.post('/signup', passport.authenticate('signup', { session: false }), (req, res) => {
+  const user = req.user;
+  delete user.password;
+  const token = jwt.sign(user, JWT_SALT);
+
   res.json({
-    message: 'Signup successful',
-    user: req.user,
+    message: 'Ok',
+    entity: token,
   });
 });
 
-router.post('/login', async (req, res, next) => {
-  passport.authenticate('login', async (err, user) => {
-    try {
-      if (err || !user) {
-        const error = new Error('An error occurred.');
+router.post('/login', (req, res, next) => {
+  passport.authenticate('login', (err, user) => {
+    if (err || !user) {
+      const error = new Error('An error occurred.');
 
-        return next(error);
-      }
-
-      req.login(user, { session: false }, async (error) => {
-        if (error) return next(error);
-
-        const body = { id: user.email, email: user.email };
-        const token = jwt.sign({ user: body }, 'TOP_SECRET');
-
-        return res.json({ token });
-      });
-    } catch (error) {
       return next(error);
     }
+
+    delete user.password;
+    const token = jwt.sign(user, JWT_SALT);
+
+    res.json({
+      message: 'Ok',
+      entity: token,
+    });
   })(req, res, next);
 });
 

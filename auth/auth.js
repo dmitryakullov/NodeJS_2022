@@ -3,6 +3,7 @@ const localStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 const { signupHandler, loginHandler } = require('../utils/databaseUtils');
+const { JWT_SALT } = require('../constants/salt');
 
 passport.use(
   'signup',
@@ -29,7 +30,7 @@ passport.use(
 passport.use(
   new JWTstrategy(
     {
-      secretOrKey: 'TOP_SECRET',
+      secretOrKey: JWT_SALT,
       jwtFromRequest: ExtractJWT.fromUrlQueryParameter('secret_token'),
     },
     async (token, done) => {
