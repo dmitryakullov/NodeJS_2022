@@ -16,7 +16,7 @@ async function signupHandler(email, password, done) {
         return done(bcryptErr);
       }
 
-      UsersDb.insert({ email, password: hash }, (err, newUser) => {
+      UsersDb.insert({ email, password: hash, firstName: '', lastName: '' }, (err, newUser) => {
         if (err || !newUser) {
           return done(err);
         }

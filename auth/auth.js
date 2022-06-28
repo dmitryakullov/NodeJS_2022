@@ -31,11 +31,11 @@ passport.use(
   new JWTstrategy(
     {
       secretOrKey: JWT_SALT,
-      jwtFromRequest: ExtractJWT.fromUrlQueryParameter('secret_token'),
+      jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
     },
-    async (token, done) => {
+    (token, done) => {
       try {
-        return done(null, token.user);
+        return done(null, token);
       } catch (error) {
         done(error);
       }

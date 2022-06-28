@@ -19,14 +19,9 @@ app.use('/', routes);
 
 app.use('/user', passport.authenticate('jwt', { session: false }), secureRoute);
 
-// app.post('/a1', (req, res) => {
-//   console.log(req.body);
-//   res.json({ body: req.body });
-// });
-
 app.use(function (err, req, res) {
   res.status(err.status || 500);
-  res.json({ error: err });
+  res.json({ message: err, entity: null });
 });
 
 const port = process.env.PORT || 4040;
