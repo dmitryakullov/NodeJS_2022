@@ -1,5 +1,5 @@
 const passport = require('passport');
-const localStrategy = require('passport-local').Strategy;
+const LocalStrategy = require('passport-local').Strategy;
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 const { signupHandler, loginHandler } = require('../utils/databaseUtils');
@@ -7,7 +7,7 @@ const { JWT_SALT } = require('../constants/salt');
 
 passport.use(
   'signup',
-  new localStrategy(
+  new LocalStrategy(
     {
       usernameField: 'email',
       passwordField: 'password',
@@ -18,7 +18,7 @@ passport.use(
 
 passport.use(
   'login',
-  new localStrategy(
+  new LocalStrategy(
     {
       usernameField: 'email',
       passwordField: 'password',

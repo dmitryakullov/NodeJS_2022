@@ -6,8 +6,8 @@ const { saltRounds, JWT_SALT } = require('./constants/salt');
 const UsersDb = new Datastore({ filename: './dataBase/users' });
 UsersDb.loadDatabase();
 
-const TodolistDb = new Datastore({ filename: './dataBase/todolist' });
-TodolistDb.loadDatabase();
+const TodoListDb = new Datastore({ filename: './dataBase/todolist' });
+TodoListDb.loadDatabase();
 
 // Hardcode User
 const HARDCODED_USER_EMAIL = 'cat@dog.com';
@@ -28,16 +28,19 @@ UsersDb.findOne({ email: HARDCODED_USER_EMAIL }, (err, user) => {
         return;
       }
 
-      UsersDb.insert({ email: HARDCODED_USER_EMAIL, password: hash, firstName: '', lastName: '' }, (err, newUser) => {
-        if (!err && newUser) {
-          logJwt(newUser);
-        }
-      });
+      UsersDb.insert(
+        { email: HARDCODED_USER_EMAIL, password: hash, firstName: '', lastName: '' },
+        (insertErr, newUser) => {
+          if (!insertErr && newUser) {
+            logJwt(newUser);
+          }
+        },
+      );
     });
   }
 });
 
 module.exports = {
   UsersDb,
-  TodolistDb,
+  TodoListDb,
 };

@@ -16,9 +16,9 @@ async function signupHandler(email, password, done) {
         return done(bcryptErr);
       }
 
-      UsersDb.insert({ email, password: hash, firstName: '', lastName: '' }, (err, newUser) => {
-        if (err || !newUser) {
-          return done(err);
+      UsersDb.insert({ email, password: hash, firstName: '', lastName: '' }, (insertErr, newUser) => {
+        if (insertErr || !newUser) {
+          return done(insertErr);
         }
 
         return done(null, newUser);
@@ -32,7 +32,7 @@ async function loginHandler(email, password, done) {
     if (err || !user) {
       return done(null, false, { message: 'Wrong Email or Password' });
     }
-    bcrypt.compare(password, user.password, function (bcryptErr, isPasswordMatch) {
+    bcrypt.compare(password, user.password, (bcryptErr, isPasswordMatch) => {
       if (bcryptErr || !isPasswordMatch) {
         return done(null, false, { message: 'Wrong Email or Password' });
       }
