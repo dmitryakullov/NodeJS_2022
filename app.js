@@ -2,6 +2,8 @@ const express = require('express');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 const PORT = process.env.PORT || 4040;
 
@@ -12,6 +14,29 @@ const routes = require('./routes/routes');
 const secureRoute = require('./routes/secureRoutes');
 
 const app = express();
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'API',
+      version: '1.0.0',
+      description: 'This is a simple API application made with Express',
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+      },
+    ],
+  },
+  apis: ['./routes/*.js'],
+  path: {
+    '/signup': {},
+  },
+};
+
+const openApiSpecification = swaggerJsdoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiSpecification, { explorer: true }));
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -27,5 +52,6 @@ app.use((err, req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+  console.log(`Listening app on port http://localhost:${PORT}`);
+  console.log(`Listening swagger on port http://localhost:${PORT}/api-docs`);
 });

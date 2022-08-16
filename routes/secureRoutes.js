@@ -3,19 +3,110 @@ const { UsersDb, TodoListDb } = require('../db');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    OkResponse:
+ *      application/json:
+ *        schema:
+ *          type: object
+ *          properties:
+ *            message:
+ *              type: string
+ *              description: Status message
+ *    TodoItem:
+ *      type: object
+ *      properties:
+ *        _id:
+ *          type: string
+ *        userId:
+ *          type: string
+ *        title:
+ *          type: string
+ *        isDone:
+ *          type: boolean
+ *  securitySchemes:
+ *    bearerAuth:
+ *      type: http
+ *      scheme: bearer
+ *      bearerFormat: JWT
+ */
+
+/**
+ * @swagger
+ * /user/profile:
+ *  get:
+ *    description: User profileDetails
+ *    security:
+ *      - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: message and user details
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: Status message
+ *                entity:
+ *                  type: object
+ *                  description: User details
+ *                  properties:
+ *                    email:
+ *                      type: string
+ *                    firstName:
+ *                      type: string
+ *                    lastName:
+ *                      type: string
+ */
+
 router.get('/profile', (req, res, next) => {
   UsersDb.findOne({ _id: req.user._id }, (err, user) => {
     if (err) {
       return next(new Error('An error occurred!'));
     }
-    delete user.password;
+    const { email, firstName, lastName } = user;
 
     res.json({
       message: 'Ok',
-      entity: user,
+      entity: {
+        email,
+        firstName,
+        lastName,
+      },
     });
   });
 });
+
+/**
+ * @swagger
+ * /user/profile:
+ *  put:
+ *    description: Edit first name and last name
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              firstName:
+ *                type: string
+ *              lastName:
+ *                type: string
+ *            example:
+ *              firstName: Tom
+ *              lastName: Smith
+ *    responses:
+ *      200:
+ *        description: message
+ *        content:
+ *          $ref: '#/components/schemas/OkResponse'
+ */
 
 router.put('/profile', (req, res, next) => {
   const { firstName, lastName } = req.body;
@@ -38,6 +129,20 @@ router.put('/profile', (req, res, next) => {
   });
 });
 
+/**
+ * @swagger
+ * /user/profile:
+ *  delete:
+ *    description: Delete user profile
+ *    security:
+ *      - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: message
+ *        content:
+ *          $ref: '#/components/schemas/OkResponse'
+ */
+
 router.delete('/profile', (req, res, next) => {
   UsersDb.remove({ _id: req.user._id }, (err) => {
     if (err) {
@@ -49,6 +154,31 @@ router.delete('/profile', (req, res, next) => {
     });
   });
 });
+
+/**
+ * @swagger
+ * /user/todo-list:
+ *  get:
+ *    description: Get all todo list
+ *    security:
+ *      - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: message
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: Status message
+ *                entity:
+ *                  type: array
+ *                  description: todo list
+ *                  items:
+ *                    $ref: '#/components/schemas/TodoItem'
+ */
 
 router.get('/todo-list', (req, res, next) => {
   TodoListDb.find({ userId: req.user._id }, (err, todoList) => {
@@ -62,6 +192,30 @@ router.get('/todo-list', (req, res, next) => {
     });
   });
 });
+
+/**
+ * @swagger
+ * /user/todo-list:
+ *  post:
+ *    description: Create new todo item
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              title:
+ *                type: string
+ *            example:
+ *              title: New todo.
+ *    responses:
+ *      200:
+ *        description: message
+ *        content:
+ *          $ref: '#/components/schemas/OkResponse'
+ */
 
 router.post('/todo-list', (req, res, next) => {
   const userId = req.user._id;
@@ -82,6 +236,30 @@ router.post('/todo-list', (req, res, next) => {
   });
 });
 
+/**
+ * @swagger
+ * /user/todo-list:
+ *  delete:
+ *    description: Delete todo item
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              todoId:
+ *                type: string
+ *            example:
+ *              todoId: '{todoId}'
+ *    responses:
+ *      200:
+ *        description: message
+ *        content:
+ *          $ref: '#/components/schemas/OkResponse'
+ */
+
 router.delete('/todo-list', (req, res, next) => {
   const userId = req.user._id;
 
@@ -100,6 +278,33 @@ router.delete('/todo-list', (req, res, next) => {
     });
   });
 });
+
+/**
+ * @swagger
+ * /user/todo-list/edit-is-done:
+ *  put:
+ *    description: Set todo status
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              todoId:
+ *                type: string
+ *              isDone:
+ *                type: boolean
+ *            example:
+ *              todoId: '{todoId}'
+ *              isDone: true
+ *    responses:
+ *      200:
+ *        description: message
+ *        content:
+ *          $ref: '#/components/schemas/OkResponse'
+ */
 
 router.put('/todo-list/edit-is-done', (req, res, next) => {
   const userId = req.user._id;
@@ -123,7 +328,34 @@ router.put('/todo-list/edit-is-done', (req, res, next) => {
   });
 });
 
-router.put('/todo-list/edit-title', (req, res, next) => {
+/**
+ * @swagger
+ * /user/todo-list/edit-title:
+ *  post:
+ *    description: Set todo status
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              todoId:
+ *                type: string
+ *              title:
+ *                type: string
+ *            example:
+ *              todoId: '{todoId}'
+ *              title: New todo title
+ *    responses:
+ *      200:
+ *        description: message
+ *        content:
+ *          $ref: '#/components/schemas/OkResponse'
+ */
+
+router.post('/todo-list/edit-title', (req, res, next) => {
   const userId = req.user._id;
 
   const { todoId, title } = req.body;
