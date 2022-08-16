@@ -21,7 +21,7 @@ const options = {
     info: {
       title: 'API',
       version: '1.0.0',
-      description: 'This is a simple API application made with Express',
+      description: 'This is a API application',
     },
     servers: [
       {
@@ -30,9 +30,6 @@ const options = {
     ],
   },
   apis: ['./routes/*.js'],
-  path: {
-    '/signup': {},
-  },
 };
 
 const openApiSpecification = swaggerJsdoc(options);
