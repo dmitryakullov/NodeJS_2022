@@ -5,34 +5,16 @@ const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
-const PORT = process.env.PORT || 4040;
-
-require('./auth/auth');
-require('./db');
-
+const { PORT, swaggerOptions } = require('./config');
 const routes = require('./routes/routes');
 const secureRoute = require('./routes/secureRoutes');
 
 const app = express();
 
-const options = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'API',
-      version: '1.0.0',
-      description: 'This is a API application',
-    },
-    servers: [
-      {
-        url: `http://localhost:${PORT}`,
-      },
-    ],
-  },
-  apis: ['./routes/*.js'],
-};
+require('./auth/auth');
+require('./db');
 
-const openApiSpecification = swaggerJsdoc(options);
+const openApiSpecification = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiSpecification, { explorer: true }));
 
 app.use(cors());
