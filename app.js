@@ -4,12 +4,15 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
 
 const { PORT, swaggerOptions } = require('./config');
 const routes = require('./routes/routes');
 const secureRoute = require('./routes/secureRoutes');
 
 const app = express();
+const httpServer = createServer(app);
 
 require('./auth/auth');
 require('./db');
@@ -30,7 +33,9 @@ app.use((err, req, res) => {
   res.json({ message: err, entity: null });
 });
 
-app.listen(PORT, () => {
+const io = new Server(httpServer);
+
+httpServer.listen(PORT, () => {
   console.log(`Listening app on port http://localhost:${PORT}`);
   console.log(`Listening swagger on port http://localhost:${PORT}/api-docs`);
 });
