@@ -195,6 +195,49 @@ router.get('/todo-list', (req, res, next) => {
 
 /**
  * @swagger
+ * /user/todo-list/{id}:
+ *  summary: Represents a user
+ *  get:
+ *    description: Get one todo
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        description: Todo ID
+ *        schema:
+ *          type: string
+ *          example: 'Xh80GaHrZqOJv555'
+ *    security:
+ *      - bearerAuth: []
+ *    responses:
+ *      200:
+ *        description: message
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: Status message
+ *                entity:
+ *                  $ref: '#/components/schemas/TodoItem'
+ */
+
+router.get('/todo-list/:id', (req, res, next) => {
+  TodoListDb.findOne({ _id: req.params.id }, (err, todo) => {
+    if (err || !todo) {
+      return next(new Error('An error occurred!'));
+    }
+
+    res.json({
+      message: 'Ok',
+      entity: todo,
+    });
+  });
+});
+
+/**
+ * @swagger
  * /user/todo-list:
  *  post:
  *    description: Create new todo item
