@@ -26,6 +26,10 @@ const router = express.Router();
  *          type: string
  *        isDone:
  *          type: boolean
+ *        dateCreated:
+ *          type:  string
+ *        dateUpdated:
+ *          type:  string
  *  securitySchemes:
  *    bearerAuth:
  *      type: http
@@ -186,9 +190,11 @@ router.get('/todo-list', (req, res, next) => {
       return next(new Error('An error occurred!'));
     }
 
+    const sortedTodoList = todoList.sort((a, b) => Date.parse(a.dateCreated) - Date.parse(b.dateCreated));
+
     res.json({
       message: 'Ok',
-      entity: todoList,
+      entity: sortedTodoList,
     });
   });
 });
@@ -268,7 +274,9 @@ router.post('/todo-list', (req, res, next) => {
     return next(new Error("Request doesn't has correct title parameter"));
   }
 
-  TodoListDb.insert({ userId, title: req.body.title, isDone: false }, (err) => {
+  const dateCreated = new Date();
+
+  TodoListDb.insert({ userId, title: req.body.title, isDone: false, dateCreated, dateUpdated: dateCreated }, (err) => {
     if (err) {
       return next(new Error('An error occurred!'));
     }
@@ -421,7 +429,7 @@ router.post('/todo-list/edit-title', (req, res, next) => {
     });
   }
 
-  TodoListDb.update({ _id: todoId, userId }, { $set: { title } }, {}, (err, num) => {
+  TodoListDb.update({ _id: todoId, userId }, { $set: { title, dateUpdated: new Date() } }, {}, (err, num) => {
     if (err || !num) {
       return next(new Error('An error occurred!'));
     }
