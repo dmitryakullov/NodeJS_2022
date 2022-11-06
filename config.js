@@ -1,5 +1,7 @@
 const PORT = process.env.PORT || 4040;
 
+const CLIENT_PORT = 'http://localhost:3000';
+
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -19,5 +21,6 @@ const swaggerOptions = {
 
 module.exports = {
   PORT,
+  CLIENT_PORT,
   swaggerOptions,
 };
