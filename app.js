@@ -4,38 +4,20 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
 
-const PORT = process.env.PORT || 4040;
-
-require('./auth/auth');
-require('./db');
-
+const { PORT, CLIENT_PORT, swaggerOptions } = require('./config');
 const routes = require('./routes/routes');
 const secureRoute = require('./routes/secureRoutes');
 
 const app = express();
+const httpServer = createServer(app);
 
-const options = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'API',
-      version: '1.0.0',
-      description: 'This is a simple API application made with Express',
-    },
-    servers: [
-      {
-        url: `http://localhost:${PORT}`,
-      },
-    ],
-  },
-  apis: ['./routes/*.js'],
-  path: {
-    '/signup': {},
-  },
-};
+require('./auth/auth');
+require('./db');
 
-const openApiSpecification = swaggerJsdoc(options);
+const openApiSpecification = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiSpecification, { explorer: true }));
 
 app.use(cors());
@@ -51,7 +33,26 @@ app.use((err, req, res) => {
   res.json({ message: err, entity: null });
 });
 
-app.listen(PORT, () => {
+const io = new Server(httpServer, { cors: { origin: CLIENT_PORT } });
+
+io.on('connection', (socket) => {
+  console.log(`User connection id: ${socket.id}`);
+
+  socket.on('join_room', (data) => {
+    socket.join(data);
+    console.log(`User ID: ${socket.id} joined room ${data}`);
+  });
+
+  socket.on('send_message', (data) => {
+    socket.to(data.room).emit('receive_message', data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User Disconnected', socket.id);
+  });
+});
+
+httpServer.listen(PORT, () => {
   console.log(`Listening app on port http://localhost:${PORT}`);
   console.log(`Listening swagger on port http://localhost:${PORT}/api-docs`);
 });
