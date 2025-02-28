@@ -21,10 +21,10 @@ You can use or JWT token below, or when you run the command *npm start* you will
 Note: you can set your client port in `config.js` file
 
 ## There is one hardcoded user.
-*email:* cat@dog.com
-*password:* 1234_Asdf
-*Hardcoded JWT token for this user:*
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNhdEBkb2cuY29tIiwiZmlyc3ROYW1lIjoiIiwibGFzdE5hbWUiOiIiLCJfaWQiOiJYaDgwR2FIclpxT0p2NDQ2IiwiaWF0IjoxNjU5OTY4NzIzfQ.ubPUsFgTSFtCpDJIR71_f0QbSaQrc2CpjSEeG_aTu9Y
+- *email:* **cat@dog.com**
+- *password:* **1234_Asdf**
+- *Hardcoded JWT token for this user:*
+**eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNhdEBkb2cuY29tIiwiZmlyc3ROYW1lIjoiIiwibGFzdE5hbWUiOiIiLCJfaWQiOiJYaDgwR2FIclpxT0p2NDQ2IiwiaWF0IjoxNjU5OTY4NzIzfQ.ubPUsFgTSFtCpDJIR71_f0QbSaQrc2CpjSEeG_aTu9Y**
 
 
 
